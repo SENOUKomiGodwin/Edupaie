@@ -47,6 +47,7 @@ dist/
 *.sqlite
 *.sqlite3
 !edupaie_test.db
+!data/edupaie_test.db
 
 # Fichiers générés
 *.pdf
