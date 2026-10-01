@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduPaie — Aperçu en direct</title>
+<style>
+  :root {
+    --bg: #f4f6fa; --card: #ffffff; --ink: #1c2333; --muted: #6b7488;
+    --line: #e3e7ef; --accent: #2563eb; --ok: #16a34a; --warn: #d97706;
+    --bad: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  header {
+    background: linear-gradient(120deg, #1d4ed8, #2563eb 60%, #3b82f6);
+    color: #fff; padding: 22px 28px;
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  }
+  header h1 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: .3px; }
+  header .sub { opacity: .85; font-size: 13px; }
+  header .live {
+    margin-left: auto; font-size: 12px; background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 3px 10px;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
+  .dot.err { background: #f87171; }
+  main { max-width: 1100px; margin: 0 auto; padding: 22px 20px 40px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
+  .card .value { font-size: 24px; font-weight: 650; margin-top: 4px; }
+  .card .value.sm { font-size: 18px; }
+  .card.ok .value { color: var(--ok); }
+  .card.warn .value { color: var(--warn); }
+  .card.bad .value { color: var(--bad); }
+  h2 { font-size: 15px; margin: 28px 0 10px; color: var(--ink); }
+  table {
+    width: 100%; border-collapse: collapse; background: var(--card);
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  th {
+    background: #f9fafc; font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: .6px; color: var(--muted); font-weight: 600;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .badge {
+    display: inline-block; padding: 2px 9px; border-radius: 999px;
+    font-size: 11.5px; font-weight: 600; white-space: nowrap;
+  }
+  .badge.ok { background: #dcfce7; color: var(--ok); }
+  .badge.warn { background: #fef3c7; color: var(--warn); }
+  .badge.bad { background: #fee2e2; color: var(--bad); }
+  .badge.info { background: #dbeafe; color: var(--accent); }
+  .error {
+    background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+    border-radius: 10px; padding: 14px 16px; white-space: pre-wrap;
+  }
+  footer { color: var(--muted); font-size: 12px; margin-top: 26px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>EduPaie</h1>
+  <span class="sub">Application de gestion des paiements scolaires — aperçu web en lecture seule</span>
+  <span class="live"><span class="dot" id="dot"></span><span id="liveLabel">connexion…</span></span>
+</header>
+<main>
+  <div id="error" class="error" hidden></div>
+  <div id="content" hidden>
+    <div class="cards" id="cards"></div>
+
+    <h2>Élèves &amp; soldes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Élève</th><th>Classe</th><th>Année</th>
+          <th class="num">Total dû</th><th class="num">Payé</th>
+          <th class="num">Restant</th><th>Statut</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyEleves"></tbody>
+    </table>
+
+    <h2>Paiements enregistrés (20 derniers)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Reçu</th><th>Date</th><th>Élève</th><th>Mode</th>
+          <th class="num">Montant</th><th class="num">Solde après</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyPaiements"></tbody>
+    </table>
+  </div>
+  <footer id="stamp">—</footer>
+</main>
+<script>
+  const fmt = n => n.toLocaleString('fr-FR') + ' FCFA';
+  const esc = s => String(s).replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const badge = statut => {
+    const cls = statut === 'Soldé' ? 'ok'
+      : statut === 'Partiellement payé' ? 'warn' : 'bad';
+    return `<span class="badge ${cls}">${esc(statut)}</span>`;
+  };
+
+  function render(data) {
+    const s = data.stats;
+    document.getElementById('cards').innerHTML = `
+      <div class="card"><div class="label">Élèves</div><div class="value">${s.eleves}</div></div>
+      <div class="card"><div class="label">Paiements</div><div class="value">${s.paiements}</div></div>
+      <div class="card"><div class="label">Classes</div><div class="value">${s.classes}</div></div>
+      <div class="card ok"><div class="label">Total encaissé</div><div class="value sm">${fmt(s.total_paye)}</div></div>
+      <div class="card warn"><div class="label">Restant dû</div><div class="value sm">${fmt(s.total_restant)}</div></div>
+      <div class="card"><div class="label">Soldés / partielles / non payées</div>
+        <div class="value sm">${s.soldes} / ${s.partielles} / ${s.non_payes}</div></div>`;
+
+    document.getElementById('tbodyEleves').innerHTML = data.eleves.map(e => `
+      <tr>
+        <td>${esc(e.prenom)} ${esc(e.nom)}</td>
+        <td><span class="badge info">${esc(e.classe)}</span></td>
+        <td>${esc(e.annee)}</td>
+        <td class="num">${fmt(e.montant_total_du)}</td>
+        <td class="num">${fmt(e.paye)}</td>
+        <td class="num">${fmt(e.restant)}</td>
+        <td>${badge(e.statut)}</td>
+      </tr>`).join('');
+
+    document.getElementById('tbodyPaiements').innerHTML = data.paiements.map(p => `
+      <tr>
+        <td>${esc(p.numero_recu)}</td>
+        <td>${esc(p.date_paiement)}</td>
+        <td>${esc(p.eleve)}</td>
+        <td>${esc(p.mode)}</td>
+        <td class="num">${fmt(p.montant)}</td>
+        <td class="num">${fmt(p.solde_apres)}</td>
+      </tr>`).join('');
+
+    document.getElementById('content').hidden = false;
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch('/api/data', { cache: 'no-store' });
+      const data = await res.json();
+      const dot = document.getElementById('dot');
+      const label = document.getElementById('liveLabel');
+      const errBox = document.getElementById('error');
+      if (data.error) {
+        dot.classList.add('err'); label.textContent = 'base absente';
+        errBox.textContent = data.error; errBox.hidden = false;
+        document.getElementById('content').hidden = true;
+      } else {
+        dot.classList.remove('err'); label.textContent = 'en direct';
+        errBox.hidden = true;
+        render(data);
+      }
+      document.getElementById('stamp').textContent =
+        'Actualisé à ' + new Date().toLocaleTimeString('fr-FR') +
+        ' — rafraîchissement automatique toutes les 3 s (données en lecture seule)';
+    } catch (e) {
+      document.getElementById('dot').classList.add('err');
+      document.getElementById('liveLabel').textContent = 'connexion perdue';
+    }
+  }
+  refresh();
+  setInterval(refresh, 3000);
+</script>
+</body>
+</html>
