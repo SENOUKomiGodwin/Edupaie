@@ -1,0 +1,14 @@
+# Dépendances pour EduPaie
+# Python 3.10+
+
+# Interface graphique
+PySide6>=6.5.0
+
+# Génération de PDF
+reportlab>=4.0.0
+
+# Tests
+pytest>=7.4.0
+
+# Packaging
+pyinstaller>=6.0.0
