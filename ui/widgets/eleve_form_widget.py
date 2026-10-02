@@ -31,14 +31,12 @@ class EleveFormDialog(QDialog):
             self.charger_eleve()
             # Désactiver le combo en mode modification pour éviter les incohérences
             self.annee_combo.setEnabled(False)
-            self.annee_info.setText("(année verrouillée)")
         elif default_annee_id:
             # Sélectionner l'année par défaut et désactiver le combo
             for i in range(self.annee_combo.count()):
                 if self.annee_combo.itemData(i) == default_annee_id:
                     self.annee_combo.setCurrentIndex(i)
                     self.annee_combo.setEnabled(False)  # Désactiver le combo
-                    self.annee_info.setText("(synchronisé avec le sélecteur)")
                     break
     
     def setup_ui(self):
@@ -48,23 +46,32 @@ class EleveFormDialog(QDialog):
         # Champs
         form_layout = QVBoxLayout()
         
+        # Taille fixe pour les labels pour l'alignement
+        label_width = 180
+        
         # Nom
         nom_layout = QHBoxLayout()
-        nom_layout.addWidget(QLabel("Nom :"))
+        nom_label = QLabel("Nom :")
+        nom_label.setFixedWidth(label_width)
+        nom_layout.addWidget(nom_label)
         self.nom_input = QLineEdit()
         nom_layout.addWidget(self.nom_input)
         form_layout.addLayout(nom_layout)
         
         # Prénom
         prenom_layout = QHBoxLayout()
-        prenom_layout.addWidget(QLabel("Prénom :"))
+        prenom_label = QLabel("Prénom :")
+        prenom_label.setFixedWidth(label_width)
+        prenom_layout.addWidget(prenom_label)
         self.prenom_input = QLineEdit()
         prenom_layout.addWidget(self.prenom_input)
         form_layout.addLayout(prenom_layout)
         
         # Classe
         classe_layout = QHBoxLayout()
-        classe_layout.addWidget(QLabel("Classe :"))
+        classe_label = QLabel("Classe :")
+        classe_label.setFixedWidth(label_width)
+        classe_layout.addWidget(classe_label)
         self.classe_combo = QComboBox()
         self.charger_classes()
         classe_layout.addWidget(self.classe_combo)
@@ -72,18 +79,19 @@ class EleveFormDialog(QDialog):
         
         # Année scolaire
         annee_layout = QHBoxLayout()
-        annee_layout.addWidget(QLabel("Année scolaire :"))
+        annee_label = QLabel("Année scolaire :")
+        annee_label.setFixedWidth(label_width)
+        annee_layout.addWidget(annee_label)
         self.annee_combo = QComboBox()
         self.charger_annees()
         annee_layout.addWidget(self.annee_combo)
-        self.annee_info = QLabel("")
-        self.annee_info.setStyleSheet("color: #6B7280; font-size: 11px;")
-        annee_layout.addWidget(self.annee_info)
         form_layout.addLayout(annee_layout)
         
         # Montant total dû
         montant_layout = QHBoxLayout()
-        montant_layout.addWidget(QLabel("Montant total dû (FCFA) :"))
+        montant_label = QLabel("Montant total dû (FCFA) :")
+        montant_label.setFixedWidth(label_width)
+        montant_layout.addWidget(montant_label)
         self.montant_input = QSpinBox()
         self.montant_input.setRange(0, 999999999)
         self.montant_input.setSingleStep(1000)
