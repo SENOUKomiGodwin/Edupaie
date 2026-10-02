@@ -105,6 +105,7 @@ class EleveListWidget(QWidget):
         self.proxy_model = QSortFilterProxyModel()
         self.proxy_model.setSourceModel(self.model)
         self._current_filter = "tous"
+        self._current_annee_id = None
         self._all_eleves = []
         self.setup_ui()
         self.charger_donnees()
@@ -467,10 +468,16 @@ class EleveListWidget(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Erreur", f"Erreur lors du chargement des classes : {e}")
 
-    def charger_donnees(self):
-        """Charge les données des élèves depuis la base et recalcule les indicateurs."""
+    def charger_donnees(self, annee_id: int = None):
+        """
+        Charge les données des élèves depuis la base et recalcule les indicateurs.
+        
+        Args:
+            annee_id: Optionnel, filtre par année scolaire
+        """
         try:
-            self._all_eleves = EleveService.get_all_eleves()
+            self._current_annee_id = annee_id
+            self._all_eleves = EleveService.get_all_eleves(annee_id)
             self._update_stat_cards()
             self._appliquer_filtres()
         except Exception as e:
@@ -652,4 +659,4 @@ class EleveListWidget(QWidget):
 
     def rafraichir(self):
         """Rafraîchit la liste et les indicateurs."""
-        self.charger_donnees()
+        self.charger_donnees(self._current_annee_id)

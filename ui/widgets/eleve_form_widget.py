@@ -19,15 +19,22 @@ from services.format_service import formater_montant
 class EleveFormDialog(QDialog):
     """Dialogue de formulaire d'élève."""
     
-    def __init__(self, parent=None, eleve_id=None):
+    def __init__(self, parent=None, eleve_id=None, default_annee_id=None):
         super().__init__(parent)
         self.eleve_id = eleve_id
+        self.default_annee_id = default_annee_id
         self.setWindowTitle("Modifier l'élève" if eleve_id else "Nouvel élève")
         self.setMinimumWidth(400)
         self.setup_ui()
         
         if eleve_id:
             self.charger_eleve()
+        elif default_annee_id:
+            # Sélectionner l'année par défaut
+            for i in range(self.annee_combo.count()):
+                if self.annee_combo.itemData(i) == default_annee_id:
+                    self.annee_combo.setCurrentIndex(i)
+                    break
     
     def setup_ui(self):
         """Configure l'interface du formulaire."""

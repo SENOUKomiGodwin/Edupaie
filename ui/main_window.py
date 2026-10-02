@@ -6,12 +6,13 @@ Design moderne avec icônes Google Fonts (Material Icons) sans emoji,
 options de menu épurées (Tableau de bord et Élèves).
 """
 
+import logging
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QStackedWidget, QPushButton, QMessageBox, QDialog,
-    QLabel, QFrame, QSizePolicy
+    QLabel, QFrame, QSizePolicy, QApplication, QComboBox
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QFont
 from config import APP_NAME, APP_VERSION
 from ui.widgets.dashboard_widget import DashboardWidget
@@ -26,6 +27,9 @@ from ui.icons import get_icon, creer_label_icone
 class MainWindow(QMainWindow):
     """Fenêtre principale de l'application EduPaie."""
 
+    # Signal émis quand l'année scolaire change
+    annee_changed = Signal(int)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"{APP_NAME} v{APP_VERSION}")
@@ -34,6 +38,7 @@ class MainWindow(QMainWindow):
         self._nav_badges = []
         self._nav_icons = ["dashboard", "people"]
         self._current_nav_index = 1  # Défaut sur "Élèves" comme sur la maquette
+        self._current_annee_id = None
 
         # Initialiser la base de données
         try:
@@ -83,6 +88,10 @@ class MainWindow(QMainWindow):
         self.eleve_list.voir_fiche.connect(self.on_voir_fiche)
         self.eleve_fiche.fermer_fiche.connect(self.on_fermer_fiche)
         self.eleve_fiche.reimprimer_recu.connect(self.on_reimprimer_recu)
+        
+        # Connexion du changement d'année scolaire
+        self.annee_changed.connect(self.eleve_list.charger_donnees)
+        self.annee_changed.connect(self.dashboard.charger_statistiques)
 
     def _create_sidebar(self) -> QWidget:
         """Crée la barre latérale blanche aux coins arrondis avec icônes Google Fonts."""
@@ -140,21 +149,40 @@ class MainWindow(QMainWindow):
         year_label.setObjectName("yearLabel")
         year_layout.addWidget(year_label)
 
+        # QComboBox pour sélectionner l'année
+        self.year_combo = QComboBox()
+        self.year_combo.setObjectName("yearCombo")
+        self.year_combo.setFixedHeight(36)
+        
+        # Charger les années scolaires
         try:
-            annee = AnneeService.get_annee_active()
-            annee_text = annee['libelle'] if annee else "2024-2025"
-        except Exception:
-            annee_text = "2024-2025"
-
-        year_row = QHBoxLayout()
-        year_value = QLabel(annee_text)
-        year_value.setObjectName("yearValue")
-        year_row.addWidget(year_value)
-        year_row.addStretch()
-
-        chevron = creer_label_icone("expand_more", theme.TEXTE_DISCRET, 18)
-        year_row.addWidget(chevron)
-        year_layout.addLayout(year_row)
+            annees = AnneeService.get_all_annees()
+            self.annee_id_to_index = {}  # Mapping id -> index
+            
+            for i, annee in enumerate(annees):
+                self.year_combo.addItem(annee['libelle'], annee['id'])
+                self.annee_id_to_index[annee['id']] = i
+                
+                # Sélectionner l'année active par défaut
+                if annee.get('active', False):
+                    self.year_combo.setCurrentIndex(i)
+                    self._current_annee_id = annee['id']
+        except Exception as e:
+            logging.error(f"Erreur lors du chargement des années: {e}")
+            self.year_combo.addItem("2024-2025", 1)
+            self._current_annee_id = 1
+        
+        # Connexion du changement d'année
+        self.year_combo.currentIndexChanged.connect(self.on_annee_changed)
+        
+        year_layout.addWidget(self.year_combo)
+        
+        # Bouton pour créer une nouvelle année
+        new_year_btn = QPushButton("+ Nouvelle année")
+        new_year_btn.setObjectName("newYearBtn")
+        new_year_btn.setFixedHeight(28)
+        new_year_btn.clicked.connect(self.on_creer_nouvelle_annee)
+        year_layout.addWidget(new_year_btn)
 
         layout.addWidget(year_frame)
         layout.addSpacing(22)
@@ -255,7 +283,7 @@ class MainWindow(QMainWindow):
         """Met à jour le badge d'effectif d'élèves sur le bouton Élèves."""
         try:
             from services.eleve_service import EleveService
-            eleves = EleveService.get_all_eleves()
+            eleves = EleveService.get_all_eleves(self._current_annee_id)
             count = len(eleves)
             badge = self._nav_badges[1]  # Élèves
             badge.setText(str(count))
@@ -278,7 +306,7 @@ class MainWindow(QMainWindow):
     def on_nouveau_eleve(self):
         """Ouvre le formulaire d'ajout d'élève."""
         from ui.widgets.eleve_form_widget import EleveFormDialog
-        dialog = EleveFormDialog(self)
+        dialog = EleveFormDialog(self, default_annee_id=self._current_annee_id)
         if dialog.exec() == QDialog.Accepted:
             self.eleve_list.rafraichir()
             self._update_eleve_badge()
@@ -346,3 +374,75 @@ class MainWindow(QMainWindow):
                 )
         except Exception as e:
             QMessageBox.critical(self, "Erreur", f"Erreur lors de la suppression : {e}")
+
+    def on_annee_changed(self, index: int):
+        """Gère le changement d'année scolaire."""
+        if index < 0:
+            return
+        
+        annee_id = self.year_combo.currentData()
+        if annee_id and annee_id != self._current_annee_id:
+            self._current_annee_id = annee_id
+            logging.info(f"Année scolaire changée vers ID: {annee_id}")
+            
+            # Émettre le signal pour les widgets
+            self.annee_changed.emit(annee_id)
+            
+            # Rafraîchir les données
+            self.eleve_list.charger_donnees(annee_id)
+            self.dashboard.charger_statistiques(annee_id)
+            self._update_eleve_badge()
+
+    def on_creer_nouvelle_annee(self):
+        """Ouvre un dialogue pour créer une nouvelle année scolaire."""
+        from PySide6.QtWidgets import QInputDialog
+        from services.annee_service import AnneeService
+        
+        # Demander le libellé de la nouvelle année
+        libelle, ok = QInputDialog.getText(
+            self,
+            "Nouvelle année scolaire",
+            "Entrez le libellé de l'année scolaire (ex: 2025-2026) :",
+            text="2025-2026"
+        )
+        
+        if ok and libelle:
+            try:
+                annee_id = AnneeService.creer_annee(libelle)
+                QMessageBox.information(
+                    self,
+                    "Succès",
+                    f"L'année scolaire '{libelle}' a été créée avec succès"
+                )
+                
+                # Recharger le combo
+                self.recharger_annees()
+                
+                # Sélectionner la nouvelle année
+                if annee_id in self.annee_id_to_index:
+                    self.year_combo.setCurrentIndex(self.annee_id_to_index[annee_id])
+                    
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Erreur",
+                    f"Erreur lors de la création de l'année : {e}"
+                )
+
+    def recharger_annees(self):
+        """Recharge la liste des années scolaires dans le combo."""
+        try:
+            annees = AnneeService.get_all_annees()
+            self.year_combo.clear()
+            self.annee_id_to_index = {}
+            
+            for i, annee in enumerate(annees):
+                self.year_combo.addItem(annee['libelle'], annee['id'])
+                self.annee_id_to_index[annee['id']] = i
+                
+                if annee.get('active', False):
+                    self.year_combo.setCurrentIndex(i)
+                    self._current_annee_id = annee['id']
+                    
+        except Exception as e:
+            logging.error(f"Erreur lors du rechargement des années: {e}")

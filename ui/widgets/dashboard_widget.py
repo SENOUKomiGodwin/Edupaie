@@ -24,6 +24,7 @@ class DashboardWidget(QWidget):
 
     def __init__(self):
         super().__init__()
+        self._current_annee_id = None
         self.setup_ui()
         self.charger_statistiques()
 
@@ -192,10 +193,16 @@ class DashboardWidget(QWidget):
 
         return {'frame': frame, 'lbl_value': lbl_val, 'progress': p}
 
-    def charger_statistiques(self):
-        """Charge et affiche les statistiques globales."""
+    def charger_statistiques(self, annee_id: int = None):
+        """
+        Charge et affiche les statistiques globales.
+        
+        Args:
+            annee_id: Optionnel, filtre par année scolaire
+        """
+        self._current_annee_id = annee_id
         try:
-            stats = DashboardService.get_statistiques()
+            stats = DashboardService.get_statistiques(annee_id)
 
             nb_eleves = stats.get('nb_eleves', 0)
             self.card_eleves['lbl_value'].setText(f"{nb_eleves} élève{'s' if nb_eleves > 1 else ''}")
@@ -220,7 +227,7 @@ class DashboardWidget(QWidget):
         statut = self.statut_filter.currentData()
 
         try:
-            eleves = DashboardService.get_eleves_par_statut(statut)
+            eleves = DashboardService.get_eleves_par_statut(statut, self._current_annee_id)
             self.table_eleves.setRowCount(len(eleves))
 
             for row, eleve in enumerate(eleves):

@@ -120,6 +120,49 @@ QLabel#yearValue {
     background: transparent;
 }
 
+QComboBox#yearCombo {
+    background-color: {{CARTE}};
+    border: 1px solid {{BORDURE_CHAMP}};
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: {{TEXTE}};
+    font-size: 13px;
+    font-weight: 500;
+}
+
+QComboBox#yearCombo:focus {
+    border: 1px solid {{VERT}};
+}
+
+QComboBox#yearCombo::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox#yearCombo QAbstractItemView {
+    background-color: {{CARTE}};
+    border: 1px solid {{BORDURE}};
+    border-radius: 8px;
+    selection-background-color: {{VERT_FOND}};
+    selection-color: {{TEXTE}};
+    padding: 4px;
+    outline: none;
+}
+
+QPushButton#newYearBtn {
+    background-color: transparent;
+    color: {{VERT}};
+    border: 1px dashed {{VERT}};
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+}
+
+QPushButton#newYearBtn:hover {
+    background-color: {{VERT_FOND}};
+}
+
 QLabel#menuLabel {
     font-size: 11px;
     font-weight: 600;
