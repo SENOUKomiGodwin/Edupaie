@@ -3,178 +3,615 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EduPaie — Aperçu en direct</title>
+<title>EduPaie — Gestion scolaire</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f6fa; --card: #ffffff; --ink: #1c2333; --muted: #6b7488;
-    --line: #e3e7ef; --accent: #2563eb; --ok: #16a34a; --warn: #d97706;
-    --bad: #dc2626;
+    --bg: #F5F6F8;
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+    --border-input: #D1D5DB;
+    --text: #111827;
+    --text-sec: #4B5563;
+    --text-mut: #9CA3AF;
+    --primary: #047857;
+    --primary-hover: #065F46;
+    --primary-bg: #ECFDF5;
+    --primary-badge: #D1FAE5;
+    --orange: #B45309;
+    --orange-bg: #FEF3C7;
+    --red: #B91C1C;
+    --red-bg: #FEF2F2;
+    --sep: #F3F4F6;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 14px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.5 "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    display: flex;
+    min-height: 100vh;
+    padding: 16px;
+    gap: 16px;
   }
-  header {
-    background: linear-gradient(120deg, #1d4ed8, #2563eb 60%, #3b82f6);
-    color: #fff; padding: 22px 28px;
-    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+
+  /* Sidebar */
+  aside.sidebar {
+    width: 230px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
   }
-  header h1 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: .3px; }
-  header .sub { opacity: .85; font-size: 13px; }
-  header .live {
-    margin-left: auto; font-size: 12px; background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 3px 10px;
-    display: inline-flex; align-items: center; gap: 7px;
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
   }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
-  .dot.err { background: #f87171; }
-  main { max-width: 1100px; margin: 0 auto; padding: 22px 20px 40px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-  .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .brand-icon .material-icons {
+    font-size: 20px;
+  }
+  .brand-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .brand-sub {
+    font-size: 11.5px;
+    color: var(--text-sec);
+  }
+
+  .year-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 22px;
+  }
+  .year-label { font-size: 11px; color: var(--text-sec); }
+  .year-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+  }
+
+  .menu-sec {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mut);
+    letter-spacing: .8px;
+    margin-bottom: 8px;
+  }
+  .nav-list { display: flex; flex-direction: column; gap: 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    color: var(--text-sec);
+    text-decoration: none;
+    font-weight: 400;
+    transition: background .15s;
+  }
+  .nav-item:hover { background: var(--sep); color: var(--text); }
+  .nav-item.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--primary-badge);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+
+  .user-box {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #E5E7EB;
+    color: var(--text-sec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* Main content */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .breadcrumb { font-size: 12px; color: var(--text-sec); margin-bottom: 2px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .btn-primary:hover { background: var(--primary-hover); }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
     padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
-  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
-  .card .value { font-size: 24px; font-weight: 650; margin-top: 4px; }
-  .card .value.sm { font-size: 18px; }
-  .card.ok .value { color: var(--ok); }
-  .card.warn .value { color: var(--warn); }
-  .card.bad .value { color: var(--bad); }
-  h2 { font-size: 15px; margin: 28px 0 10px; color: var(--ink); }
+  .kpi-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-sec);
+  }
+  .kpi-icon .material-icons {
+    font-size: 18px;
+  }
+  .kpi-val { font-size: 20px; font-weight: 700; color: var(--text); }
+  .kpi-val.orange { color: var(--orange); }
+  .kpi-sub { font-size: 11px; color: var(--text-mut); margin-top: -2px; }
+
+  .progress-track {
+    height: 5px;
+    background: var(--sep);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+  .fill-green { background: var(--primary); }
+  .fill-orange { background: var(--orange); }
+
+  /* Filters */
+  .filter-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    background: var(--card);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    padding: 7px 12px 7px 36px;
+    font-size: 13px;
+    color: var(--text);
+    width: 220px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--primary); }
+  .search-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-mut);
+    font-size: 18px;
+    pointer-events: none;
+  }
+
+  .select-box {
+    background: var(--card);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+  }
+
+  .chip {
+    background: var(--card);
+    border: 1px solid var(--border-input);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    color: var(--text-sec);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .chip.active {
+    background: var(--primary);
+    color: #FFFFFF;
+    border-color: var(--primary);
+  }
+
+  /* Table Card */
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
   table {
-    width: 100%; border-collapse: collapse; background: var(--card);
-    border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
   }
-  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
   th {
-    background: #f9fafc; font-size: 11.5px; text-transform: uppercase;
-    letter-spacing: .6px; color: var(--muted); font-weight: 600;
+    background: var(--card);
+    color: var(--text-sec);
+    font-weight: 500;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--sep);
+    vertical-align: middle;
   }
   tr:last-child td { border-bottom: none; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .badge {
-    display: inline-block; padding: 2px 9px; border-radius: 999px;
-    font-size: 11.5px; font-weight: 600; white-space: nowrap;
+  tr.selected { background: var(--primary-bg) !important; }
+  tr:hover { background: #FAFAFA; }
+
+  .eleve-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .badge.ok { background: #dcfce7; color: var(--ok); }
-  .badge.warn { background: #fef3c7; color: var(--warn); }
-  .badge.bad { background: #fee2e2; color: var(--bad); }
-  .badge.info { background: #dbeafe; color: var(--accent); }
-  .error {
-    background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
-    border-radius: 10px; padding: 14px 16px; white-space: pre-wrap;
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #F0EEEC;
+    color: var(--text-sec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
   }
-  footer { color: var(--muted); font-size: 12px; margin-top: 26px; text-align: center; }
+  .eleve-name { font-weight: 600; color: var(--text); }
+
+  .statut-solde { color: var(--primary); font-weight: 600; }
+  .statut-partiel { color: var(--orange); font-weight: 600; }
+  .statut-non-paye { color: var(--red); font-weight: 600; }
+
+  .table-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-sec);
+  }
+
+  /* Action Bar */
+  .action-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .action-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .btn-del {
+    background: #FFFFFF;
+    color: var(--red);
+    border: 1px solid #FCA5A5;
+    border-radius: 8px;
+    width: 36px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-del .material-icons {
+    font-size: 18px;
+  }
+  .btn-del:hover { background: var(--red-bg); }
+
+  .action-btns {
+    display: flex;
+    gap: 10px;
+  }
+  .btn-outline {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border-input);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-outline:hover { background: var(--sep); }
 </style>
 </head>
 <body>
-<header>
-  <h1>EduPaie</h1>
-  <span class="sub">Application de gestion des paiements scolaires — aperçu web en lecture seule</span>
-  <span class="live"><span class="dot" id="dot"></span><span id="liveLabel">connexion…</span></span>
-</header>
-<main>
-  <div id="error" class="error" hidden></div>
-  <div id="content" hidden>
-    <div class="cards" id="cards"></div>
 
-    <h2>Élèves &amp; soldes</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Élève</th><th>Classe</th><th>Année</th>
-          <th class="num">Total dû</th><th class="num">Payé</th>
-          <th class="num">Restant</th><th>Statut</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyEleves"></tbody>
-    </table>
-
-    <h2>Paiements enregistrés (20 derniers)</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Reçu</th><th>Date</th><th>Élève</th><th>Mode</th>
-          <th class="num">Montant</th><th class="num">Solde après</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyPaiements"></tbody>
-    </table>
+<!-- Barre latérale -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><span class="material-icons">menu_book</span></div>
+    <div>
+      <div class="brand-title">EduPaie</div>
+      <div class="brand-sub">Gestion scolaire</div>
+    </div>
   </div>
-  <footer id="stamp">—</footer>
+
+  <div class="year-box">
+    <div class="year-label">Année scolaire</div>
+    <div class="year-val"><span id="lblAnnee">2024-2025</span> <span>▾</span></div>
+  </div>
+
+  <div class="menu-sec">MENU</div>
+  <nav class="nav-list">
+    <a href="#" class="nav-item"><span class="material-icons" style="font-size: 18px;">dashboard</span> Tableau de bord</a>
+    <a href="#" class="nav-item active"><span class="material-icons" style="font-size: 18px;">people</span> Élèves <span class="nav-badge" id="badgeCount">0</span></a>
+    <a href="#" class="nav-item"><span class="material-icons" style="font-size: 18px;">payment</span> Paiements</a>
+    <a href="#" class="nav-item"><span class="material-icons" style="font-size: 18px;">settings</span> Paramètres</a>
+  </nav>
+
+  <div class="user-box">
+    <div class="user-avatar">SE</div>
+    <div>
+      <div style="font-weight: 600; font-size: 12.5px;">Secrétariat</div>
+      <div style="font-size: 11px; color: var(--text-mut);">v1.0.0</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Contenu principal -->
+<main>
+  <div class="header-row">
+    <div>
+      <div class="breadcrumb">Élèves</div>
+      <div class="page-title">Liste des élèves</div>
+    </div>
+    <button class="btn-primary" onclick="alert('Fonctionnalité disponible dans l\'application bureau EduPaie.')">+ Nouvel élève</button>
+  </div>
+
+  <!-- Cartes KPI -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-top"><span>Encaissé</span><span class="kpi-icon" style="color: var(--primary);"><span class="material-icons">check_circle</span></span></div>
+      <div class="kpi-val" id="valEncaisse">0 FCFA</div>
+      <div class="progress-track"><div class="progress-fill fill-green" id="barEncaisse" style="width: 0%;"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-top"><span>Reste à payer</span><span class="kpi-icon" style="color: var(--orange);"><span class="material-icons">sync</span></span></div>
+      <div class="kpi-val orange" id="valReste">0 FCFA</div>
+      <div class="progress-track"><div class="progress-fill fill-orange" id="barReste" style="width: 0%;"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-top"><span>Non soldés</span><span class="kpi-icon" style="color: var(--red);"><span class="material-icons">warning</span></span></div>
+      <div class="kpi-val" id="valNonSoldes">0 élèves</div>
+      <div class="kpi-sub" id="subInscrits">sur 0 inscrits</div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filter-row">
+    <div class="search-wrapper">
+      <span class="material-icons search-icon">search</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Nom ou prénom" oninput="applyFilters()">
+    </div>
+    <select id="classSelect" class="select-box" onchange="applyFilters()">
+      <option value="">Toutes les classes</option>
+    </select>
+    <button class="chip active" onclick="setChip('tous', this)" id="chipTous">Tous</button>
+    <button class="chip" onclick="setChip('non_paye', this)" id="chipNonPaye">Non payés</button>
+    <button class="chip" onclick="setChip('partiel', this)" id="chipPartiel">Partiels</button>
+    <button class="chip" onclick="setChip('solde', this)" id="chipSolde">Soldés</button>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Élève</th>
+          <th>Classe</th>
+          <th style="text-align: right;">Total dû</th>
+          <th style="text-align: right;">Solde</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody id="elevesTbody"></tbody>
+    </table>
+    <div class="table-footer">
+      <div id="footerCount">1 à 0 sur 0 élèves</div>
+      <div>‹ &nbsp; 1 &nbsp; 2 &nbsp; 3 &nbsp; ›</div>
+    </div>
+  </div>
+
+  <!-- Barre d'action contextuelle -->
+  <div class="action-bar" id="actionBar" style="display: none;">
+    <div class="action-left">
+      <div style="font-weight: 600; font-size: 13.5px;" id="selectedName">Élève sélectionné</div>
+      <button class="btn-del" title="Supprimer" onclick="alert('Disponible dans l\'application bureau EduPaie.')"><span class="material-icons">delete</span></button>
+    </div>
+    <div class="action-btns">
+      <button class="btn-outline" onclick="alert('Disponible dans l\'application bureau EduPaie.')"><span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">description</span> Voir fiche</button>
+      <button class="btn-outline" onclick="alert('Disponible dans l\'application bureau EduPaie.')"><span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">edit</span> Modifier</button>
+      <button class="btn-primary" onclick="alert('Disponible dans l\'application bureau EduPaie.')"><span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">add_card</span> Enregistrer paiement</button>
+    </div>
+  </div>
 </main>
+
 <script>
-  const fmt = n => n.toLocaleString('fr-FR') + ' FCFA';
-  const esc = s => String(s).replace(/[&<>"']/g,
-    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badge = statut => {
-    const cls = statut === 'Soldé' ? 'ok'
-      : statut === 'Partiellement payé' ? 'warn' : 'bad';
-    return `<span class="badge ${cls}">${esc(statut)}</span>`;
+  let rawEleves = [];
+  let currentChip = 'tous';
+  let selectedId = null;
+
+  const fmt = n => Number(n).toLocaleString('fr-FR') + ' FCFA';
+  const getInitials = (prenom, nom) => {
+    const p = (prenom || '').trim();
+    const n = (nom || '').trim();
+    return ((p[0] || '') + (n[0] || '')).toUpperCase() || '??';
   };
 
-  function render(data) {
-    const s = data.stats;
-    document.getElementById('cards').innerHTML = `
-      <div class="card"><div class="label">Élèves</div><div class="value">${s.eleves}</div></div>
-      <div class="card"><div class="label">Paiements</div><div class="value">${s.paiements}</div></div>
-      <div class="card"><div class="label">Classes</div><div class="value">${s.classes}</div></div>
-      <div class="card ok"><div class="label">Total encaissé</div><div class="value sm">${fmt(s.total_paye)}</div></div>
-      <div class="card warn"><div class="label">Restant dû</div><div class="value sm">${fmt(s.total_restant)}</div></div>
-      <div class="card"><div class="label">Soldés / partielles / non payées</div>
-        <div class="value sm">${s.soldes} / ${s.partielles} / ${s.non_payes}</div></div>`;
-
-    document.getElementById('tbodyEleves').innerHTML = data.eleves.map(e => `
-      <tr>
-        <td>${esc(e.prenom)} ${esc(e.nom)}</td>
-        <td><span class="badge info">${esc(e.classe)}</span></td>
-        <td>${esc(e.annee)}</td>
-        <td class="num">${fmt(e.montant_total_du)}</td>
-        <td class="num">${fmt(e.paye)}</td>
-        <td class="num">${fmt(e.restant)}</td>
-        <td>${badge(e.statut)}</td>
-      </tr>`).join('');
-
-    document.getElementById('tbodyPaiements').innerHTML = data.paiements.map(p => `
-      <tr>
-        <td>${esc(p.numero_recu)}</td>
-        <td>${esc(p.date_paiement)}</td>
-        <td>${esc(p.eleve)}</td>
-        <td>${esc(p.mode)}</td>
-        <td class="num">${fmt(p.montant)}</td>
-        <td class="num">${fmt(p.solde_apres)}</td>
-      </tr>`).join('');
-
-    document.getElementById('content').hidden = false;
+  function setChip(val, btn) {
+    currentChip = val;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
   }
 
-  async function refresh() {
+  function applyFilters() {
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
+    const classe = document.getElementById('classSelect').value;
+
+    let filtered = rawEleves.filter(e => {
+      const matchText = (e.nom + ' ' + e.prenom).toLowerCase().includes(search);
+      const matchClasse = !classe || e.classe === classe;
+      let matchStatut = true;
+      if (currentChip === 'non_paye') matchStatut = e.statut === 'Non payé';
+      if (currentChip === 'partiel') matchStatut = e.statut === 'Partiellement payé';
+      if (currentChip === 'solde') matchStatut = e.statut === 'Soldé';
+      return matchText && matchClasse && matchStatut;
+    });
+
+    renderTable(filtered);
+  }
+
+  function selectRow(id, name) {
+    selectedId = id;
+    document.getElementById('selectedName').textContent = name + ' sélectionné';
+    document.getElementById('actionBar').style.display = 'flex';
+    applyFilters();
+  }
+
+  function renderTable(eleves) {
+    const tbody = document.getElementById('elevesTbody');
+    tbody.innerHTML = eleves.map(e => {
+      const isSelected = selectedId === e.id;
+      const initials = getInitials(e.prenom, e.nom);
+      const stCls = e.statut === 'Soldé' ? 'statut-solde' : (e.statut === 'Partiellement payé' ? 'statut-partiel' : 'statut-non-paye');
+      return `
+        <tr class="${isSelected ? 'selected' : ''}" onclick="selectRow(${e.id}, '${e.prenom} ${e.nom}')" style="cursor: pointer;">
+          <td>
+            <div class="eleve-cell">
+              <div class="avatar">${initials}</div>
+              <div class="eleve-name">${e.nom} ${e.prenom}</div>
+            </div>
+          </td>
+          <td>${e.classe}</td>
+          <td style="text-align: right; font-weight: 500;">${fmt(e.montant_total_du)}</td>
+          <td style="text-align: right; font-weight: 500;">${fmt(e.restant)}</td>
+          <td class="${stCls}">${e.statut}</td>
+        </tr>
+      `;
+    }).join('');
+
+    document.getElementById('footerCount').textContent = `1 à ${eleves.length} sur ${rawEleves.length} élèves`;
+  }
+
+  async function loadData() {
     try {
       const res = await fetch('/api/data', { cache: 'no-store' });
       const data = await res.json();
-      const dot = document.getElementById('dot');
-      const label = document.getElementById('liveLabel');
-      const errBox = document.getElementById('error');
-      if (data.error) {
-        dot.classList.add('err'); label.textContent = 'base absente';
-        errBox.textContent = data.error; errBox.hidden = false;
-        document.getElementById('content').hidden = true;
-      } else {
-        dot.classList.remove('err'); label.textContent = 'en direct';
-        errBox.hidden = true;
-        render(data);
+      if (!data || data.error) return;
+
+      rawEleves = data.eleves.map((e, idx) => ({ ...e, id: idx + 1 }));
+      const s = data.stats;
+
+      document.getElementById('badgeCount').textContent = s.eleves;
+      document.getElementById('valEncaisse').textContent = fmt(s.total_paye);
+      document.getElementById('valReste').textContent = fmt(s.total_restant);
+      document.getElementById('valNonSoldes').textContent = `${s.partielles + s.non_payes} élèves`;
+      document.getElementById('subInscrits').textContent = `sur ${s.eleves} inscrits`;
+
+      const tot = s.total_paye + s.total_restant;
+      if (tot > 0) {
+        document.getElementById('barEncaisse').style.width = Math.round((s.total_paye / tot) * 100) + '%';
+        document.getElementById('barReste').style.width = Math.round((s.total_restant / tot) * 100) + '%';
       }
-      document.getElementById('stamp').textContent =
-        'Actualisé à ' + new Date().toLocaleTimeString('fr-FR') +
-        ' — rafraîchissement automatique toutes les 3 s (données en lecture seule)';
-    } catch (e) {
-      document.getElementById('dot').classList.add('err');
-      document.getElementById('liveLabel').textContent = 'connexion perdue';
-    }
+
+      document.getElementById('chipTous').textContent = `Tous ${s.eleves}`;
+      document.getElementById('chipNonPaye').textContent = `Non payés ${s.non_payes}`;
+      document.getElementById('chipPartiel').textContent = `Partiels ${s.partielles}`;
+      document.getElementById('chipSolde').textContent = `Soldés ${s.soldes}`;
+
+      // Classes dropdown
+      const sel = document.getElementById('classSelect');
+      const classes = [...new Set(rawEleves.map(e => e.classe))];
+      sel.innerHTML = '<option value="">Toutes les classes</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+
+      applyFilters();
+    } catch(e) {}
   }
-  refresh();
-  setInterval(refresh, 3000);
+
+  loadData();
+  setInterval(loadData, 4000);
 </script>
 </body>
 </html>

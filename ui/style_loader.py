@@ -57,18 +57,29 @@ def substituer_marqueurs(qss: str) -> str:
         "TEXTE_SECOND": theme.TEXTE_SECOND,
         "TEXTE_DISCRET": theme.TEXTE_DISCRET,
         "VERT": theme.VERT,
+        "VERT_FONCE": theme.VERT_FONCE,
         "VERT_HOVER": theme.VERT_HOVER,
         "VERT_FOND": theme.VERT_FOND,
+        "VERT_CLAIR": theme.VERT_CLAIR,
+        "VERT_TEXTE": theme.VERT_TEXTE,
+        "BLEU": theme.BLEU,
+        "BLEU_FOND": theme.BLEU_FOND,
         "ORANGE": theme.ORANGE,
+        "ORANGE_FOND": theme.ORANGE_FOND,
+        "ORANGE_BORDURE": theme.ORANGE_BORDURE,
         "ROUGE": theme.ROUGE,
         "ROUGE_BORDURE": theme.ROUGE_BORDURE,
         "ROUGE_FOND": theme.ROUGE_FOND,
         "RAYON_CONTROLE": str(theme.RAYON_CONTROLE),
         "RAYON_CARTE": str(theme.RAYON_CARTE),
+        "RAYON_SIDEBAR": str(theme.RAYON_SIDEBAR),
+        "RAYON_PILULE": str(theme.RAYON_PILULE),
         "POLICE": theme.POLICE,
         "TAILLE_TITRE_PAGE": str(theme.TAILLE_TITRE_PAGE),
+        "TAILLE_SOUS_TITRE": str(theme.TAILLE_SOUS_TITRE),
         "TAILLE_CORPS": str(theme.TAILLE_CORPS),
         "TAILLE_LEGENDE": str(theme.TAILLE_LEGENDE),
+        "TAILLE_STAT": str(theme.TAILLE_STAT),
     }
 
     resultat = qss
@@ -118,12 +129,12 @@ def charger_style(app: QApplication) -> bool:
         )
         return False
 
-    except (OSError, KeyError):
-        logging.exception("Erreur lors du chargement de la feuille de style")
+    except (OSError, KeyError) as e:
+        logging.exception(f"Erreur lors du chargement de la feuille de style : {e}")
         QMessageBox.critical(
             None,
             "Erreur de style",
-            f"Erreur lors du chargement du style :\n{qss_path}\n\n"
+            f"Erreur lors du chargement du style :\n{qss_path}\n\n{e}\n\n"
             "L'application s'affichera sans style."
         )
         return False

@@ -85,8 +85,10 @@ def main():
         app.setApplicationName("EduPaie")
         app.setOrganizationName("EduPaie")
 
-        # Charger la feuille de style (avant la fenêtre principale)
+        # Charger la feuille de style et les polices d'icônes
         charger_style(app)
+        from ui.icons import charger_police_icones
+        charger_police_icones()
 
         logging.info("Initialisation de l'interface...")
 
