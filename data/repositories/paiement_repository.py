@@ -145,15 +145,26 @@ class PaiementRepository:
             return next_num
     
     @staticmethod
-    def get_total_encaisse() -> int:
+    def get_total_encaisse(annee_id: int = None) -> int:
         """
         Calcule le total des paiements encaissés.
+        
+        Args:
+            annee_id: Optionnel, filtre par année scolaire
         
         Returns:
             Total en FCFA
         """
         with get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COALESCE(SUM(montant), 0) FROM paiement")
+            if annee_id:
+                cursor.execute("""
+                    SELECT COALESCE(SUM(p.montant), 0)
+                    FROM paiement p
+                    JOIN eleve e ON p.eleve_id = e.id
+                    WHERE e.annee_id = ?
+                """, (annee_id,))
+            else:
+                cursor.execute("SELECT COALESCE(SUM(montant), 0) FROM paiement")
             result = cursor.fetchone()
             return result[0] if result else 0

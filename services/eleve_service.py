@@ -17,14 +17,20 @@ class EleveService:
     """Service pour la gestion des élèves."""
     
     @staticmethod
-    def get_all_eleves() -> List[Dict]:
+    def get_all_eleves(annee_id: Optional[int] = None) -> List[Dict]:
         """
         Récupère tous les élèves avec leur solde et statut.
+        
+        Args:
+            annee_id: Si fourni, filtre les élèves par année scolaire
         
         Returns:
             Liste des élèves avec informations calculées
         """
-        eleves = EleveRepository.get_all()
+        if annee_id:
+            eleves = EleveRepository.get_by_annee(annee_id)
+        else:
+            eleves = EleveRepository.get_all()
         
         for eleve in eleves:
             total_paye = EleveRepository.get_total_paye_by_eleve(eleve['id'])

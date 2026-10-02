@@ -16,24 +16,29 @@ class DashboardService:
     """Service pour les statistiques du tableau de bord."""
     
     @staticmethod
-    def get_statistiques() -> Dict:
+    def get_statistiques(annee_id: int = None) -> Dict:
         """
         Calcule toutes les statistiques globales.
+        
+        Args:
+            annee_id: Optionnel, filtre par année scolaire
         
         Returns:
             Dictionnaire avec les statistiques
         """
         # Nombre d'élèves
-        nb_eleves = EleveRepository.count()
+        if annee_id:
+            eleves = EleveRepository.get_by_annee(annee_id)
+            nb_eleves = len(eleves)
+        else:
+            nb_eleves = EleveRepository.count()
+            eleves = EleveRepository.get_all()
         
-        # Total encaissé
-        total_encaisse = PaiementService.get_total_encaisse()
+        # Total encaissé (filtré par année)
+        total_encaisse = PaiementService.get_total_encaisse(annee_id)
         
-        # Total restant dû
-        total_restant = EleveRepository.get_total_restant_du()
-        
-        # Élèves non soldés
-        eleves = EleveRepository.get_all()
+        # Total restant dû (filtré par année)
+        total_restant = 0
         nb_non_soldes = 0
         nb_soldes = 0
         nb_partiels = 0
@@ -41,6 +46,7 @@ class DashboardService:
         for eleve in eleves:
             total_paye = EleveRepository.get_total_paye_by_eleve(eleve['id'])
             solde = eleve['montant_total_du'] - total_paye
+            total_restant += solde
             
             if solde <= 0:
                 nb_soldes += 1
@@ -61,12 +67,13 @@ class DashboardService:
         }
     
     @staticmethod
-    def get_eleves_par_statut(statut: str) -> list:
+    def get_eleves_par_statut(statut: str, annee_id: int = None) -> list:
         """
         Récupère les élèves filtrés par statut.
         
         Args:
             statut: Statut à filtrer ('soldé', 'partiel', 'non_payé')
+            annee_id: Optionnel, filtre par année scolaire
             
         Returns:
             Liste des élèves correspondants
@@ -74,7 +81,7 @@ class DashboardService:
         from services.eleve_service import EleveService
         from config import STATUT_SOLDE, STATUT_PARTIEL, STATUT_NON_PAYE
         
-        eleves = EleveService.get_all_eleves()
+        eleves = EleveService.get_all_eleves(annee_id)
         
         if statut == 'soldé':
             return [e for e in eleves if e['statut'] == STATUT_SOLDE]

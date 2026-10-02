@@ -150,11 +150,14 @@ class PaiementService:
         return FORMAT_NUMERO_RECUS.format(annee=annee, numero=numero)
     
     @staticmethod
-    def get_total_encaisse() -> int:
+    def get_total_encaisse(annee_id: int = None) -> int:
         """
         Calcule le total des paiements encaissés.
+        
+        Args:
+            annee_id: Optionnel, filtre par année scolaire
         
         Returns:
             Total en FCFA
         """
-        return PaiementRepository.get_total_encaisse()
+        return PaiementRepository.get_total_encaisse(annee_id)

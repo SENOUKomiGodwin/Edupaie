@@ -90,6 +90,32 @@ class EleveRepository:
             return [dict(row) for row in rows]
     
     @staticmethod
+    def get_by_annee(annee_id: int) -> List[dict]:
+        """
+        Récupère les élèves d'une année scolaire spécifique.
+        
+        Args:
+            annee_id: ID de l'année scolaire
+            
+        Returns:
+            Liste des élèves de cette année (dictionnaires)
+        """
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT e.id, e.nom, e.prenom, e.classe_id, e.annee_id,
+                       e.montant_total_du, c.nom as classe_nom,
+                       a.libelle as annee_libelle
+                FROM eleve e
+                JOIN classe c ON e.classe_id = c.id
+                JOIN annee_scolaire a ON e.annee_id = a.id
+                WHERE e.annee_id = ?
+                ORDER BY e.nom, e.prenom
+            """, (annee_id,))
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+    
+    @staticmethod
     def get_by_id(eleve_id: int) -> Optional[dict]:
         """
         Récupère un élève par son ID.
