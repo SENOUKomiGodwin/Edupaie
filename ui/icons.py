@@ -6,11 +6,11 @@ garantissant un rendu professionnel et sans aucun emoji.
 """
 
 import logging
+import sys
+from pathlib import Path
 from PySide6.QtGui import QFont, QFontDatabase, QIcon, QPixmap, QPainter, QColor
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QLabel, QPushButton
-from ui.style_loader import resource_path
-from ui import theme
 
 FONT_FAMILY = "Material Icons"
 _FONT_LOADED = False
@@ -43,6 +43,26 @@ CODEPOINTS = {
 }
 
 
+def resource_path(relative_path):
+    """
+    Retourne le chemin absolu d'une ressource, fonctionnant aussi avec PyInstaller.
+
+    Args:
+        relative_path: Chemin relatif depuis la racine du projet
+
+    Returns:
+        Path: Chemin absolu vers la ressource
+    """
+    if getattr(sys, 'frozen', False):
+        # Mode exécutable (PyInstaller)
+        base_path = Path(sys._MEIPASS)
+    else:
+        # Mode développement
+        base_path = Path(__file__).parent.parent
+
+    return base_path / relative_path
+
+
 def charger_police_icones() -> bool:
     """Charge la police Google Material Icons dans l'application."""
     global _FONT_LOADED
@@ -50,6 +70,8 @@ def charger_police_icones() -> bool:
         return True
 
     font_path = resource_path("ui/fonts/MaterialIcons-Regular.ttf")
+    logging.info(f"Chemin de la police Material Icons: {font_path}")
+
     if not font_path.exists():
         logging.warning(f"Fichier de police Google Fonts introuvable : {font_path}")
         return False
@@ -103,7 +125,7 @@ def get_icon(name: str, color: str = None, size: int = 18) -> QIcon:
     if not glyph:
         return QIcon()
 
-    color_val = color if color else theme.TEXTE_SECOND
+    color_val = color if color else "#4B5563"
 
     # Création d'une pixmap avec support haute résolution (2x)
     scale = 2
