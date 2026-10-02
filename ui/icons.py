@@ -26,18 +26,10 @@ CODEPOINTS = {
     "delete": "\ue872",             # Poubelle / Supprimer
     "edit": "\ue3c9",               # Crayon / Modifier
     "visibility": "\ue8f4",         # Oeil / Voir fiche
-    "payment": "\ue8a1",            # Carte / Paiement
-    "payments": "\ue8a1",           # Paiements
-    "credit_card": "\ue870",        # Carte de crédit
     "print": "\ue8ad",              # Imprimante / Reçu
     "refresh": "\ue5d5",            # Flèche circulaire / Actualiser
     "arrow_back": "\ue5c4",         # Flèche retour
     "expand_more": "\ue5cf",        # Chevron bas déroulant
-    "check": "\ue5ca",              # Coche validation
-    "warning": "\ue002",            # Triangle alerte
-    "error": "\ue000",              # Erreur / Alerte
-    "hourglass": "\ue88b",          # Sablier / En attente
-    "history": "\ue889",            # Horloge historique
     "close": "\ue5cd",              # Croix fermeture / Annuler
     "save": "\ue161",               # Disquette / Enregistrer
 }
