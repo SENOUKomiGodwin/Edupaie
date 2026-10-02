@@ -51,7 +51,7 @@ class AnneeRepository:
         Crée une nouvelle année scolaire.
         
         Args:
-            libelle: Libellé de l'année (ex: "2024-2025")
+            libelle: Libellé de l'année (ex: "2025-2026")
             
         Returns:
             ID de l'année créée

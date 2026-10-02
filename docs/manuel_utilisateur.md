@@ -11,7 +11,7 @@
 1. **Nom** : Entrez le nom de famille de l'élève (ex: Koffi)
 2. **Prénom** : Entrez le prénom de l'élève (ex: Yawovi)
 3. **Classe** : Sélectionnez la classe dans la liste déroulante (ex: CM2)
-4. **Année scolaire** : Sélectionnez l'année scolaire (ex: 2024-2025)
+4. **Année scolaire** : Sélectionnez l'année scolaire (ex: 2025-2026)
 5. **Montant total dû** : Entrez le montant total des frais de scolarité en FCFA (ex: 250000)
 
 ### Étape 3 : Enregistrer

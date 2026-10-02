@@ -89,7 +89,7 @@ Deux options :
 
 **Option A : Via l'interface**
 1. Créer les classes (CP1, CP2, CM1, CM2, etc.)
-2. Créer l'année scolaire (ex: 2024-2025)
+2. Créer l'année scolaire (ex: 2025-2026)
 3. Créer les élèves manuellement
 
 **Option B : Via le script de seed**
