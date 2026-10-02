@@ -29,11 +29,16 @@ class EleveFormDialog(QDialog):
         
         if eleve_id:
             self.charger_eleve()
+            # Désactiver le combo en mode modification pour éviter les incohérences
+            self.annee_combo.setEnabled(False)
+            self.annee_info.setText("(année verrouillée)")
         elif default_annee_id:
-            # Sélectionner l'année par défaut
+            # Sélectionner l'année par défaut et désactiver le combo
             for i in range(self.annee_combo.count()):
                 if self.annee_combo.itemData(i) == default_annee_id:
                     self.annee_combo.setCurrentIndex(i)
+                    self.annee_combo.setEnabled(False)  # Désactiver le combo
+                    self.annee_info.setText("(synchronisé avec le sélecteur)")
                     break
     
     def setup_ui(self):
@@ -71,6 +76,9 @@ class EleveFormDialog(QDialog):
         self.annee_combo = QComboBox()
         self.charger_annees()
         annee_layout.addWidget(self.annee_combo)
+        self.annee_info = QLabel("")
+        self.annee_info.setStyleSheet("color: #6B7280; font-size: 11px;")
+        annee_layout.addWidget(self.annee_info)
         form_layout.addLayout(annee_layout)
         
         # Montant total dû
