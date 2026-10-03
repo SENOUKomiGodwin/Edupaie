@@ -4,6 +4,9 @@ Script de peuplement de la base de données avec des données de test.
 Crée des classes, années, élèves et paiements avec des noms togolais/ouest-africains.
 """
 
+import os
+import sys
+from pathlib import Path
 from data.database import initialize_database
 from services.classe_service import ClasseService
 from services.annee_service import AnneeService
@@ -12,8 +15,22 @@ from services.paiement_service import PaiementService
 from datetime import datetime
 
 def seed_database():
-    """Peuple la base de données avec des données de test."""
-    print("=== Peuplement de la base de données ===\n")
+    """Peuple la base de données modèle (data/edupaie_test.db) avec des données de test."""
+    # Forcer l'utilisation de data/edupaie_test.db
+    model_db_path = Path(__file__).parent / "data" / "edupaie_test.db"
+    os.environ["EDUPAIE_DB"] = str(model_db_path)
+    
+    # Supprimer la base existante si elle existe
+    if model_db_path.exists():
+        model_db_path.unlink()
+        print(f"[INFO] Base modèle supprimée : {model_db_path}")
+    
+    print("=== Peuplement de la base de données modèle ===\n")
+    print(f"Base cible : {model_db_path}\n")
+    
+    # Initialiser la base avec le schéma
+    initialize_database()
+    print("[OK] Schéma initialisé\n")
     
     # Créer les classes
     print("--- Création des classes ---")
@@ -143,5 +160,4 @@ def seed_database():
 
 
 if __name__ == "__main__":
-    initialize_database()
     seed_database()

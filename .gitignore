@@ -40,13 +40,12 @@ dist/
 *.swo
 *~
 
-# Base de données locale (sauf le fichier de test)
+# Base de données locale (sauf le fichier de test modèle)
 *.db
 *.db-shm
 *.db-wal
 *.sqlite
 *.sqlite3
-!edupaie_test.db
 !data/edupaie_test.db
 
 # Fichiers générés

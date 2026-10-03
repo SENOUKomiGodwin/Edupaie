@@ -10,6 +10,7 @@ import logging
 import shutil
 from pathlib import Path
 from typing import Optional
+from config import get_database_path as config_get_database_path
 
 
 def resource_path(relative_path):
@@ -34,42 +35,43 @@ def resource_path(relative_path):
 
 def get_database_path() -> Path:
     """
-    Retourne le chemin vers la base de données.
+    Retourne le chemin vers la base de données depuis config.py.
 
-    La base est stockée dans le dossier utilisateur de l'application,
-    accessible en écriture même après packaging avec PyInstaller.
-
+    Si la base n'existe pas, copie la base embarquée (dev uniquement).
+    
     Returns:
         Path: Chemin vers le fichier de base de données
     """
-    # En développement, base dans le répertoire courant
-    # En production (PyInstaller), base dans le dossier utilisateur
-    if getattr(sys, 'frozen', False):
-        # Application packagée
-        base_dir = Path.home() / "EduPaie"
-    else:
-        # Développement
-        base_dir = Path(__file__).parent.parent
+    db_path = Path(config_get_database_path())
+    
+    # En développement uniquement, copier la base embarquée si elle n'existe pas
+    if not getattr(sys, 'frozen', False):
+        if not db_path.exists():
+            embedded_db = resource_path("data/edupaie_test.db")
+            logging.info(f"Base de données introuvable: {db_path}")
+            logging.info(f"Copie depuis la base embarquée: {embedded_db}")
 
-    base_dir.mkdir(parents=True, exist_ok=True)
-    db_path = base_dir / "edupaie.db"
-
-    # Si la base n'existe pas, copier la base embarquée
-    if not db_path.exists():
-        embedded_db = resource_path("data/edupaie_test.db")
-        logging.info(f"Base de données utilisateur introuvable: {db_path}")
-        logging.info(f"Copie depuis la base embarquée: {embedded_db}")
-
-        if embedded_db.exists():
-            shutil.copy2(embedded_db, db_path)
-            logging.info(f"Base de données copiée avec succès")
+            if embedded_db.exists():
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(embedded_db, db_path)
+                logging.info(f"Base de données copiée avec succès")
+            else:
+                logging.warning(f"Base embarquée introuvable: {embedded_db}")
+                # Créer une base vide avec le schéma
+                # Utiliser directement le fichier schema.sql sans appeler initialize_database
+                schema_path = resource_path("data/schema.sql")
+                if schema_path.exists():
+                    db_path.parent.mkdir(parents=True, exist_ok=True)
+                    conn = sqlite3.connect(db_path)
+                    with open(schema_path, 'r', encoding='utf-8') as f:
+                        schema_sql = f.read()
+                    conn.executescript(schema_sql)
+                    conn.commit()
+                    conn.close()
+                    logging.info(f"Base de données créée avec le schéma")
         else:
-            logging.warning(f"Base embarquée introuvable: {embedded_db}")
-            # Créer une base vide avec le schéma
-            initialize_database()
-    else:
-        logging.info(f"Base de données existante: {db_path}")
-
+            logging.info(f"Base de données existante: {db_path}")
+    
     return db_path
 
 
