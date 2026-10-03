@@ -154,11 +154,33 @@ class EleveFicheWidget(QWidget):
 
         # Tableau des paiements
         self.table_paiements = QTableWidget()
+        self.table_paiements.setObjectName("paiementsTable")
         self.table_paiements.setColumnCount(5)
         self.table_paiements.setHorizontalHeaderLabels([
             "Date", "Montant", "Mode", "N° Reçu", "Solde après"
         ])
-        self.table_paiements.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # Utiliser Stretch avec des proportions ajustées pour plus d'espace entre Montant et Mode
+        h = self.table_paiements.horizontalHeader()
+        h.setSectionResizeMode(0, QHeaderView.Stretch)      # Date
+        h.setSectionResizeMode(1, QHeaderView.Stretch)      # Montant (plus large)
+        h.setSectionResizeMode(2, QHeaderView.Stretch)      # Mode
+        h.setSectionResizeMode(3, QHeaderView.Stretch)      # N° Reçu
+        h.setSectionResizeMode(4, QHeaderView.Stretch)      # Solde après (plus large)
+        h.setStretchLastSection(False)
+        # Définir des largeurs initiales pour influencer les proportions
+        self.table_paiements.setColumnWidth(0, 140)  # Date
+        self.table_paiements.setColumnWidth(1, 180)  # Montant (plus large)
+        self.table_paiements.setColumnWidth(2, 140)  # Mode
+        self.table_paiements.setColumnWidth(3, 170)  # N° Reçu
+        self.table_paiements.setColumnWidth(4, 180)  # Solde après (plus large)
+        h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # Aligner les en-têtes des colonnes numériques à droite
+        header_item_montant = self.table_paiements.horizontalHeaderItem(1)
+        if header_item_montant:
+            header_item_montant.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        header_item_solde = self.table_paiements.horizontalHeaderItem(4)
+        if header_item_solde:
+            header_item_solde.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
         self.table_paiements.setSelectionBehavior(QTableWidget.SelectRows)
         self.table_paiements.setSelectionMode(QTableWidget.SingleSelection)
         self.table_paiements.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -172,22 +194,31 @@ class EleveFicheWidget(QWidget):
     def _creer_mini_bloc(self, label: str, val: str, val_col: str) -> dict:
         """Crée un petit bloc statistique encadré."""
         frame = QFrame()
+        frame.setObjectName("miniBloc")
         frame.setStyleSheet(f"""
-            background-color: {theme.FOND};
-            border: 1px solid {theme.BORDURE};
-            border-radius: 8px;
+            QFrame#miniBloc {{
+                background-color: {theme.FOND};
+                border: 1px solid {theme.BORDURE};
+                border-radius: 8px;
+            }}
+            QFrame#miniBloc QLabel {{
+                border: none;
+                background: transparent;
+            }}
         """)
-        frame.setFixedSize(140, 60)
+        frame.setMinimumSize(140, 60)
+        frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         l = QVBoxLayout(frame)
         l.setContentsMargins(10, 8, 10, 8)
-        l.setSpacing(2)
+        l.setSpacing(4)
 
         lbl = QLabel(label)
-        lbl.setObjectName("legendLabel")
+        lbl.setStyleSheet(f"font-size: 11px; color: {theme.TEXTE_SECOND};")
         l.addWidget(lbl)
 
         val_lbl = QLabel(val)
         val_lbl.setStyleSheet(f"font-size: 14px; font-weight: 700; color: {val_col};")
+        val_lbl.setWordWrap(False)
         l.addWidget(val_lbl)
 
         return {'frame': frame, 'val': val_lbl}
@@ -243,15 +274,31 @@ class EleveFicheWidget(QWidget):
             self.table_paiements.setRowCount(len(paiements))
 
             for row, p in enumerate(paiements):
-                self.table_paiements.setItem(row, 0, QTableWidgetItem(p['date_paiement']))
+                # Date : aligné à gauche
+                item_date = QTableWidgetItem(p['date_paiement'])
+                item_date.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table_paiements.setItem(row, 0, item_date)
 
+                # Montant : aligné à droite avec police grasse
                 item_montant = QTableWidgetItem(p['montant_formate'])
                 item_montant.setFont(QFont("Segoe UI", 10, QFont.DemiBold))
+                item_montant.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 self.table_paiements.setItem(row, 1, item_montant)
 
-                self.table_paiements.setItem(row, 2, QTableWidgetItem(p['mode_texte']))
-                self.table_paiements.setItem(row, 3, QTableWidgetItem(p['numero_recu']))
-                self.table_paiements.setItem(row, 4, QTableWidgetItem(p['solde_formate']))
+                # Mode : aligné à gauche
+                item_mode = QTableWidgetItem(p['mode_texte'])
+                item_mode.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table_paiements.setItem(row, 2, item_mode)
+
+                # N° Reçu : aligné à gauche
+                item_recu = QTableWidgetItem(p['numero_recu'])
+                item_recu.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table_paiements.setItem(row, 3, item_recu)
+
+                # Solde après : aligné à droite
+                item_solde = QTableWidgetItem(p['solde_formate'])
+                item_solde.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                self.table_paiements.setItem(row, 4, item_solde)
 
                 self.table_paiements.item(row, 0).setData(Qt.UserRole, p['id'])
 
