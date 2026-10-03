@@ -17,13 +17,22 @@ Devise : Franc CFA (FCFA)
 ### Dépendances
 
 ```bash
+# Créer un environnement virtuel (recommandé)
+python -m venv venv
+venv\Scripts\activate  # Windows
+
+# Installer les dépendances
 pip install -r requirements.txt
 ```
 
 ## Lancement
 
 ```bash
+# Avec environnement virtuel activé
 python main.py
+
+# Ou sans activation
+venv\Scripts\python main.py
 ```
 
 ## Architecture
@@ -40,4 +49,4 @@ Voir le dossier `docs/` pour la documentation complète et le manuel utilisateur
 
 ## Licence
 
-© 2024 - EduPaie
+© 2026 - EduPaie

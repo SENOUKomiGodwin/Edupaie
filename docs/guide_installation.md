@@ -14,15 +14,23 @@
    cd EduPaie
    ```
 
-2. **Installer les dépendances**
+2. **Créer un environnement virtuel** (recommandé)
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate  # Windows
+   ```
+
+3. **Installer les dépendances**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Lancer l'application**
+4. **Lancer l'application**
    ```bash
    python main.py
    ```
+
+**Note** : L'application utilise `data/edupaie_dev.db` en développement (copiée depuis le modèle `data/edupaie_test.db` au premier lancement).
 
 ## 2. Création de l'exécutable Windows avec PyInstaller
 
@@ -40,12 +48,13 @@ pip install pyinstaller
 Depuis le répertoire racine du projet :
 
 ```bash
-pyinstaller build/edupaie.spec
+python -m PyInstaller --noconfirm edupaie.spec
 ```
 
 Cela créera :
 - `build/` : fichiers de construction intermédiaires
-- `dist/EduPaie.exe` : l'exécutable final
+- `dist/EduPaie/` : dossier contenant l'exécutable et les ressources
+- `dist/EduPaie/EduPaie.exe` : l'exécutable final
 
 ### Étape 4 : Tester l'exécutable
 
@@ -60,10 +69,9 @@ Cela créera :
 ```
 EduPaie/
 ├── EduPaie.exe          # L'exécutable
-├── README.md             # Instructions d'utilisation
+├── _internal/          # Ressources embarquées (Python, dlls, etc.)
+├── README.md           # Instructions d'utilisation
 ├── Manuel_Utilisateur.md  # Guide pour l'utilisateur final
-└── logs/                 # Dossier créé automatiquement
-    └── edupaie.log       # Fichier de log
 ```
 
 ### Pour l'utilisateur final
@@ -74,6 +82,8 @@ EduPaie/
    - La base de données dans `C:\Users\<votre utilisateur>\EduPaie\edupaie.db`
    - Le dossier `logs/` pour les fichiers de log
    - Le dossier où les reçus PDF seront sauvegardés
+
+**Note** : Au premier lancement, la base de données est copiée depuis les ressources embarquées (contenant les données de test).
 
 ## 4. Premier lancement et configuration
 
@@ -121,14 +131,14 @@ Cela créera automatiquement :
 ### Sauvegarde manuelle
 
 1. Localiser le fichier de base de données :
-   - Développement : `edupaie.db` dans le répertoire du projet
+   - Développement : `data/edupaie_dev.db` dans le répertoire du projet
    - Production : `C:\Users\<votre utilisateur>\EduPaie\edupaie.db`
 2. Copier ce fichier dans un emplacement sécurisé (USB, cloud, etc.)
 
 ### Restauration
 
 1. Fermer EduPaie
-2. Remplacer le fichier `edupaie.db` par la sauvegarde
+2. Remplacer le fichier de base de données par la sauvegarde
 3. Relancer EduPaie
 
 ## 7. Dépannage

@@ -14,6 +14,7 @@ data/
 ├── __init__.py
 ├── database.py          # Connexion et initialisation de la base
 ├── schema.sql           # Script de création des tables
+├── edupaie_test.db      # Modèle de base en lecture seule
 └── repositories/
     ├── __init__.py
     ├── classe_repository.py      # Opérations sur les classes
@@ -23,11 +24,17 @@ data/
 ```
 
 **Responsabilités :**
-- Gestion de la connexion SQLite
+- Gestion de la connexion SQLite via `config.get_database_path()`
 - Exécution des requêtes SQL paramétrées
 - Validation des contraintes d'intégrité
 - Aucune logique métier
 - Aucune dépendance à PySide6
+
+**Configuration de la base :**
+- Le chemin de la base est déterminé par la variable d'environnement `EDUPAIE_DB`
+- En développement : utilise `data/edupaie_dev.db` (copiée depuis le modèle)
+- Le modèle `data/edupaie_test.db` est en lecture seule et utilisé pour les tests et le packaging
+- Les tests utilisent une base temporaire isolée via `tests/conftest.py`
 
 **Exemple de code :**
 ```python
@@ -66,6 +73,7 @@ services/
 **Responsabilités :**
 - Calcul du solde et du statut de paiement
 - Validation des données métier
+- Validation du format des années scolaires (AAAA-AAAA)
 - Formatage des montants en FCFA
 - Génération des numéros de reçu
 - Aucune dépendance à PySide6
@@ -117,6 +125,8 @@ ui/
 - Aucun SQL direct
 - Aucune règle métier
 - Utilisation des services pour la logique
+- Gestion de l'affichage des noms longs (élision)
+- Génération de PDF avec reportlab canvas
 
 ## 2. Choix Techniques Justifiés
 
@@ -173,10 +183,21 @@ ui/
 ```
 classe (id, nom UNIQUE)
   ↓
+annee_scolaire (id, libelle UNIQUE)
+  ↓
 eleve (id, nom, prenom, classe_id FK, annee_id FK, montant_total_du INTEGER)
   ↓
 paiement (id, eleve_id FK, montant INTEGER, date_paiement, mode, numero_recu UNIQUE, solde_apres)
+sequence_recu (id, annee, dernier_numero)
 ```
+
+### 3.2 Validation des Années Scolaires
+
+Le libellé des années scolaires doit respecter le format **AAAA-AAAA** avec les contraintes suivantes :
+- La 2ème année doit être égale à la 1ère année + 1 (ex: 2024-2025)
+- La 1ère année doit être entre 2000 et l'année courante + 5
+- Exemples valides : 2024-2025, 2023-2024, 2000-2001
+- Exemples invalides : 2099-2100 (trop futur), 1999-2000 (trop ancien), 2024-2026 (pas consécutif)
 
 ### 3.2 Contraintes d'Intégrité
 
@@ -227,9 +248,10 @@ Tous les messages sont en français, clairs et explicites :
 - Pas d'authentification multi-utilisateur
 - Pas d'export CSV/Excel des données
 - Pas de sauvegarde/restauration automatique
-- Pas de configuration de l'école (nom, adresse)
+- Pas de configuration de l'école (nom, adresse) - utilise config.py
 - Pas de gestion des frais supplémentaires
 - Pas de rapport financier avancé
+- L'application ne gère qu'une seule école (informations dans config.py)
 
 ### 5.5 Possibles Extensions
 - Authentification avec rôles (admin, secrétaire)

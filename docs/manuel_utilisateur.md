@@ -1,5 +1,21 @@
 # Manuel Utilisateur - EduPaie
 
+## 0. Sélecteur d'année scolaire
+
+### Fonctionnement
+- Le sélecteur d'année scolaire se trouve dans la barre latérale en haut
+- Les années sont triées par ordre chronologique décroissant (la plus récente en premier)
+- Sélectionner une année filtre automatiquement la liste des élèves et les statistiques
+- Seuls les élèves de l'année sélectionnée sont affichés
+- L'année sélectionnée est mémorisée pour les prochains lancements
+
+### Créer une nouvelle année scolaire
+1. Cliquez sur le bouton "+ Nouvelle année" sous le sélecteur
+2. Entrez le libellé de l'année au format AAAA-AAAA (ex: 2025-2026)
+3. La nouvelle année est ajoutée à la liste et automatiquement sélectionnée
+
+**Note** : Le format de l'année doit être AAAA-AAAA avec des années consécutives (ex: 2024-2025). Les années trop anciennes (avant 2000) ou trop futures (après année courante + 5) sont refusées.
+
 ## 1. Enregistrer un nouvel élève
 
 ### Étape 1 : Accéder à l'écran des élèves
@@ -11,8 +27,10 @@
 1. **Nom** : Entrez le nom de famille de l'élève (ex: Koffi)
 2. **Prénom** : Entrez le prénom de l'élève (ex: Yawovi)
 3. **Classe** : Sélectionnez la classe dans la liste déroulante (ex: CM2)
-4. **Année scolaire** : Sélectionnez l'année scolaire (ex: 2025-2026)
+4. **Année scolaire** : L'année scolaire est pré-sélectionnée selon le sélecteur de la barre latérale
 5. **Montant total dû** : Entrez le montant total des frais de scolarité en FCFA (ex: 250000)
+
+**Note** : L'année scolaire est synchronisée avec le sélecteur de la barre latérale. Pour changer d'année, utilisez le sélecteur dans la barre latérale avant de créer l'élève.
 
 ### Étape 3 : Enregistrer
 1. Cliquez sur le bouton "Enregistrer"
@@ -93,10 +111,12 @@
 Cliquez sur "Tableau de bord" dans la barre latérale.
 
 ### Statistiques affichées
-- **Nombre d'élèves** : Total d'élèves enregistrés
-- **Total encaissé** : Somme de tous les paiements en FCFA
-- **Total restant dû** : Somme des soldes restants en FCFA
-- **Élèves non soldés** : Nombre d'élèves qui n'ont pas payé en totalité
+- **Nombre d'élèves** : Total d'élèves enregistrés pour l'année scolaire sélectionnée
+- **Total encaissé** : Somme de tous les paiements en FCFA pour l'année sélectionnée
+- **Total restant dû** : Somme des soldes restants en FCFA pour l'année sélectionnée
+- **Élèves non soldés** : Nombre d'élèves qui n'ont pas payé en totalité pour l'année sélectionnée
+
+**Note** : Toutes les statistiques sont filtrées par l'année scolaire sélectionnée dans la barre latérale.
 
 ### Filtrage
 - Utilisez le filtre "Filtrer par statut" pour voir :
