@@ -26,7 +26,7 @@ class EleveDelegate(QStyledItemDelegate):
     """Delegate personnalisé pour la colonne Élève avec pastille d'initiales grise."""
 
     def paint(self, painter, option, index):
-        """Dessine la cellule avec pastille d'initiales grise et nom complet."""
+        """Dessine la cellule avec pastille d'initiales grise et nom complet (élué si trop long)."""
         try:
             painter.save()
             painter.setRenderHint(QPainter.Antialiasing)
@@ -34,6 +34,7 @@ class EleveDelegate(QStyledItemDelegate):
             # Récupérer les données
             model = index.model()
             text = model.data(index, Qt.DisplayRole) or ""
+            full_text = model.data(index, Qt.UserRole) or text  # Nom complet pour tooltip
 
             # Extraire les initiales
             parts = text.split()
@@ -72,15 +73,21 @@ class EleveDelegate(QStyledItemDelegate):
             iy = circle_y + (circle_size + fm.ascent() - fm.descent()) // 2
             painter.drawText(ix, iy, initials)
 
-            # Nom complet à droite de l'avatar
+            # Nom complet à droite de l'avatar (élué si trop long)
             text_x = circle_x + circle_size + 12
+            available_width = option.rect.right() - text_x - 14  # Marge à droite
+            
             font_name = QFont("Segoe UI", 10)
             font_name.setWeight(QFont.Medium)
             painter.setFont(font_name)
             painter.setPen(QColor(theme.TEXTE))
             fm_name = QFontMetrics(font_name)
+            
+            # Éluder le texte si trop long
+            elided_text = fm_name.elidedText(text, Qt.ElideRight, available_width)
+            
             text_y = option.rect.top() + (option.rect.height() + fm_name.ascent() - fm_name.descent()) // 2
-            painter.drawText(text_x, text_y, text)
+            painter.drawText(text_x, text_y, elided_text)
 
         except Exception as e:
             logging.exception("Erreur dans EleveDelegate.paint()")

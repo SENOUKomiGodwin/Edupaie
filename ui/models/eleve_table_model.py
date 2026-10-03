@@ -48,6 +48,18 @@ class EleveTableModel(QAbstractTableModel):
             elif col == 4:  # Statut
                 return eleve.get("statut", "")
 
+        elif role == Qt.ToolTipRole and col == 0:
+            # Info-bulle avec le nom complet
+            nom = eleve.get("nom", "")
+            prenom = eleve.get("prenom", "")
+            return f"{nom} {prenom}"
+
+        elif role == Qt.UserRole and col == 0:
+            # Stocker le nom complet pour le delegate
+            nom = eleve.get("nom", "")
+            prenom = eleve.get("prenom", "")
+            return f"{nom} {prenom}"
+
         elif role == Qt.ForegroundRole and col == 4:
             # Code couleur pour le statut (texte coloré)
             statut = eleve.get("statut", "")
