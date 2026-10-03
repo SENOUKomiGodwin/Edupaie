@@ -10,9 +10,9 @@ import logging
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QStackedWidget, QPushButton, QMessageBox, QDialog,
-    QLabel, QFrame, QSizePolicy, QApplication, QComboBox
+    QLabel, QFrame, QSizePolicy, QApplication, QComboBox, QInputDialog
 )
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import Qt, QSize, Signal, QSettings
 from PySide6.QtGui import QFont
 from config import APP_NAME, APP_VERSION
 from ui.widgets.dashboard_widget import DashboardWidget
@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self._nav_icons = ["dashboard", "people"]
         self._current_nav_index = 1  # Défaut sur "Élèves" comme sur la maquette
         self._current_annee_id = None
+        self._settings = QSettings("EduPaie", "EduPaie")
 
         # Initialiser la base de données
         try:
@@ -153,20 +154,33 @@ class MainWindow(QMainWindow):
         self.year_combo = QComboBox()
         self.year_combo.setObjectName("yearCombo")
         self.year_combo.setFixedHeight(36)
+        self.year_combo.setMaxVisibleItems(8)
         
-        # Charger les années scolaires
+        # Charger les années scolaires triées par ordre décroissant
         try:
             annees = AnneeService.get_all_annees()
+            # Trier par libellé décroissant (ordre chronologique inverse)
+            annees_triees = sorted(annees, key=lambda x: x['libelle'], reverse=True)
             self.annee_id_to_index = {}  # Mapping id -> index
             
-            for i, annee in enumerate(annees):
+            for i, annee in enumerate(annees_triees):
                 self.year_combo.addItem(annee['libelle'], annee['id'])
                 self.annee_id_to_index[annee['id']] = i
-                
-                # Sélectionner l'année active par défaut
-                if annee.get('active', False):
-                    self.year_combo.setCurrentIndex(i)
-                    self._current_annee_id = annee['id']
+            
+            # Charger l'année mémorisée dans QSettings
+            saved_annee_id = self._settings.value("current_annee_id", type=int)
+            
+            if saved_annee_id and saved_annee_id in self.annee_id_to_index:
+                # L'année mémorisée existe encore
+                self.year_combo.setCurrentIndex(self.annee_id_to_index[saved_annee_id])
+                self._current_annee_id = saved_annee_id
+            else:
+                # L'année mémorisée n'existe plus, utiliser la première (la plus récente)
+                if annees_triees:
+                    self.year_combo.setCurrentIndex(0)
+                    self._current_annee_id = annees_triees[0]['id']
+                    # Sauvegarder la nouvelle année
+                    self._settings.setValue("current_annee_id", self._current_annee_id)
         except Exception as e:
             logging.error(f"Erreur lors du chargement des années: {e}")
             self.year_combo.addItem("2024-2025", 1)
@@ -384,6 +398,9 @@ class MainWindow(QMainWindow):
         if annee_id and annee_id != self._current_annee_id:
             self._current_annee_id = annee_id
             logging.info(f"Année scolaire changée vers ID: {annee_id}")
+            
+            # Sauvegarder dans QSettings
+            self._settings.setValue("current_annee_id", annee_id)
             
             # Émettre le signal pour les widgets
             self.annee_changed.emit(annee_id)
