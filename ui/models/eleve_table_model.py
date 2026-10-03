@@ -71,9 +71,17 @@ class EleveTableModel(QAbstractTableModel):
                 return QColor(185, 28, 28)  # #B91C1C
 
         elif role == Qt.TextAlignmentRole:
-            if col in [2, 3]:  # Montants alignés à droite
+            if col == 0:  # Élève : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            elif col == 1:  # Classe : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            elif col == 2:  # Total dû : aligné à droite
                 return Qt.AlignRight | Qt.AlignVCenter
-            else:  # Texte aligné à gauche
+            elif col == 3:  # Solde : aligné à droite
+                return Qt.AlignRight | Qt.AlignVCenter
+            elif col == 4:  # Statut : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            else:
                 return Qt.AlignLeft | Qt.AlignVCenter
 
         return None
@@ -82,6 +90,19 @@ class EleveTableModel(QAbstractTableModel):
         """Retourne les en-têtes de colonnes."""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self._headers[section]
+        elif role == Qt.TextAlignmentRole and orientation == Qt.Horizontal:
+            if section == 0:  # Élève : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            elif section == 1:  # Classe : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            elif section == 2:  # Total dû : aligné à droite
+                return Qt.AlignRight | Qt.AlignVCenter
+            elif section == 3:  # Solde : aligné à droite
+                return Qt.AlignRight | Qt.AlignVCenter
+            elif section == 4:  # Statut : aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
+            else:
+                return Qt.AlignLeft | Qt.AlignVCenter
         return None
 
     def set_data(self, data: List[Dict]):

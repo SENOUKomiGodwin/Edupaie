@@ -425,13 +425,14 @@ QTableView, QTableWidget {
 QTableView::item, QTableWidget::item {
     padding: 10px 14px;
     border: none;
-    border-bottom: 1px solid {{SEPARATEUR}};
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     min-height: 48px;
 }
 
 QTableView::item:selected, QTableWidget::item:selected {
     background-color: {{VERT_FOND}};
     color: {{TEXTE}};
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 QHeaderView::section {
@@ -439,9 +440,15 @@ QHeaderView::section {
     color: {{TEXTE_SECOND}};
     font-size: 12px;
     font-weight: 500;
-    padding: 12px 14px;
+    padding: 12px 16px;
     border: none;
     border-bottom: 1px solid {{BORDURE}};
+    text-align: left;
+}
+
+/* Padding spécifique pour le tableau des paiements */
+QTableWidget#paiementsTable::item {
+    padding: 10px 16px;
 }
 
 /* ---------- Barres de défilement discrètes ---------- */

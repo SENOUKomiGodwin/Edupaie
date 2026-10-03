@@ -53,7 +53,7 @@ class EleveDelegate(QStyledItemDelegate):
 
             # Configuration du cercle avatar
             circle_size = 32
-            circle_x = option.rect.left() + 14
+            circle_x = option.rect.left() + 14  # Padding gauche
             circle_y = option.rect.top() + (option.rect.height() - circle_size) // 2
 
             # Cercle gris doux
@@ -189,6 +189,15 @@ class EleveListWidget(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+        
+        # Alignement des en-têtes
+        self.table.horizontalHeader().setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        
+        # Aligner spécifiquement les colonnes numériques à droite
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
 
         table_card_layout.addWidget(self.table, 1)
 
