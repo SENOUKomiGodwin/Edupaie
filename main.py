@@ -85,6 +85,15 @@ def main():
         app.setApplicationName("EduPaie")
         app.setOrganizationName("EduPaie")
 
+        # Configurer l'icône de l'application (Windows)
+        if sys.platform == "win32":
+            import ctypes
+            from PySide6.QtGui import QIcon
+            # Identifiant propre à l'application : sans lui, Windows regroupe la fenêtre
+            # sous l'icône de Python dans la barre des tâches.
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("edupaie.gestion.paiements")
+            app.setWindowIcon(QIcon(str(resource_path("assets/icon.ico"))))
+
         # Charger la feuille de style et les polices d'icônes
         charger_style(app)
         from ui.icons import charger_police_icones
