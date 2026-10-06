@@ -439,9 +439,15 @@ QHeaderView::section {
     color: {{TEXTE_SECOND}};
     font-size: 12px;
     font-weight: 500;
-    padding: 12px 14px;
+    padding: 12px 16px;
     border: none;
     border-bottom: 1px solid {{BORDURE}};
+    text-align: left;
+}
+
+/* Padding spécifique pour le tableau des paiements */
+QTableWidget#paiementsTable::item {
+    padding: 10px 16px;
 }
 
 /* ---------- Barres de défilement discrètes ---------- */

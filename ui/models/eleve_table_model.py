@@ -82,6 +82,11 @@ class EleveTableModel(QAbstractTableModel):
         """Retourne les en-têtes de colonnes."""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self._headers[section]
+        elif role == Qt.TextAlignmentRole and orientation == Qt.Horizontal:
+            if section in [2, 3]:  # Montants alignés à droite
+                return Qt.AlignRight | Qt.AlignVCenter
+            else:  # Texte aligné à gauche
+                return Qt.AlignLeft | Qt.AlignVCenter
         return None
 
     def set_data(self, data: List[Dict]):
