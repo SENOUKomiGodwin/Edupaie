@@ -117,7 +117,9 @@ class DashboardWidget(QWidget):
         self.table_eleves.setHorizontalHeaderLabels([
             "Nom", "Prénom", "Classe", "Statut"
         ])
-        self.table_eleves.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        h = self.table_eleves.horizontalHeader()
+        h.setSectionResizeMode(QHeaderView.Stretch)
+        h.setDefaultAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.table_eleves.setSelectionBehavior(QTableWidget.SelectRows)
         self.table_eleves.setSelectionMode(QTableWidget.SingleSelection)
         self.table_eleves.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -233,14 +235,21 @@ class DashboardWidget(QWidget):
             for row, eleve in enumerate(eleves):
                 item_nom = QTableWidgetItem(eleve['nom'])
                 item_nom.setFont(QFont("Segoe UI", 10, QFont.Medium))
+                item_nom.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 self.table_eleves.setItem(row, 0, item_nom)
 
-                self.table_eleves.setItem(row, 1, QTableWidgetItem(eleve['prenom']))
-                self.table_eleves.setItem(row, 2, QTableWidgetItem(eleve['classe_nom']))
+                item_prenom = QTableWidgetItem(eleve['prenom'])
+                item_prenom.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table_eleves.setItem(row, 1, item_prenom)
+
+                item_classe = QTableWidgetItem(eleve['classe_nom'])
+                item_classe.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table_eleves.setItem(row, 2, item_classe)
 
                 st = eleve['statut']
                 statut_item = QTableWidgetItem(st)
                 statut_item.setFont(QFont("Segoe UI", 10, QFont.DemiBold))
+                statut_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
                 if st == STATUT_SOLDE:
                     statut_item.setForeground(QColor(theme.VERT))
                 elif st == STATUT_PARTIEL:
